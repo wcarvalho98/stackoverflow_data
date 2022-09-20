@@ -1,0 +1,66 @@
+---
+title: "Projeto"
+author: "Christian Lira and Wilder Carvalho"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    css: C:\\Users\\chris\\Documents\\styles.css
+---
+
+```{r setup, include=FALSE, cache=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("rmdformats", repos = "http://cran.us.r-project.org")
+install.packages("knitr", repos = "http://cran.us.r-project.org")
+library(rmdformats)
+library(knitr)
+```
+
+# Introdução {.tabset .title}
+
+O Stack overflow é uma plataforma gratuita de perguntas e respostas para programadores, estudantes e entusiastas em tecnologia e desenvolvimento. Nele, qualquer usuário pode publicar uma dúvida para ser respondida por outros membros do site. Além disso, a plataforma oferece classificados de empregos na área de tecnologia.
+
+## Importância {.sub-title}
+
+Trabalhar com desenvolvimento de software exige conhecimento multidisciplinar e estudo. É comum observar que pessoas novatas na área sintam-se frustradas pela quantidade de assuntos paralelos que estão envolvidos no aprendizado de uma “simples” linguagem de programação.
+
+Para um programador Java, por exemplo, espera-se que ele tenha conhecimento de versionamento de código, Programação Orientada a Objetos (POO), modelagem de banco de dados, conexão a banco de dados, frameworks entre diversos outros assuntos que se fossemos citar aqui seria uma lista gigantesca.
+
+É humanamente impossível, um indivíduo saber com perfeição todos os tópicos que envolvem um fluxo de desenvolvimento de software. Entramos na Universidade, achando que estamos 100% prontos para resolver qualquer problema complexo no mercado de trabalho, mas a realidade não é essa.
+
+No dia-a-dia no mercado de trabalho, bem como na universidade, frequentemente desenvolvedores de todo o mundo recorrem à internet em busca de dúvidas e, hoje, um dos ambientes mais utilizados é o Stack Overflow, que serve como uma comunidade de programadores, um espaço em que os profissionais/estudantes podem trocar dicas, elencar soluções e esclarecer dúvidas sobre códigos.
+
+Por ser uma das ferramentas mais utilizadas, com o propósito de troca de conhecimento em programação. Esperamos, inferir através da comunidade de usuários da plataforma, informações como: “Comparativo salarial dos desenvolvedores ao redor do mundo”, “Meios de aprendizagem mais utilizados para aprendizado da programação”, “Gêneros dos profissionais de desenvolvimento por localidade”, “Etnia dos profissionais vs Salário médio”, “Saúde mental dos profissionais”.
+
+## Origem dos dados {.sub-title}
+
+Os dados são provenientes de uma plataforma que reúne diversas bases de dados disponíveis publicamente e de forma gratuita sendo suficiente realizar um cadastro na plataforma. A base de dados se encontra-se aqui: [stack overflow annual-developer survey 2022.]( https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022)
+
+
+Esses dados possuem diversas características relacionadas aos desenvolvedores que responderam a pesquisa. Os dados variam desde a educação do desenvolvedor até o hobby dele. Dessa maneira, iremos, neste projeto, realizar uma análise exploratória dos dados de maneira a ranquear os países extraindo características dos desenvolvedores como sua educação, trabalho, salário, experiência e entre outras informações. A partir disso iremos elencar os países desses desenvolvedores em um conjunto de análises de maneira a visualizar pontos como salário médio entre os desenvolvedores ao redor do mundo, educação dos desenvolvedores por país, tecnologias mais utilizadas em cada país, tecnologias que são tendências baseada na vontade do que os desenvolvedores pretendem se especializar no futuro, o uso do StackOverflow por cada tipo de profissional e por cada país, experiência de trabalho baseada no país e densidade de profissionais em cada país.
+Tais extrações possibilitam uma análise de mercado que pode auxiliar na tomada de decisão de profissionais iniciantes na carreira do desenvolvimento ou até mesmo quem pensa em fazer uma transição de carreira.
+
+# Pacotes Necessários {.tabset .title}
+
+
+Os seguintes pacotes serão utilizados no projeto:
+
+
+
+```{r echo=FALSE}
+v <- c("library(rmarkdown)", "library(rmdformats)", "library(knitr)", "library(dplyr)", "library(ggplot2)")
+f <- c("utilizado na conversão de arquivo em R em diversos formatos", "customização do template gerado pelo rmarkdown", "para geração de tabelas", "para manipulação avançada dos DataFrames", "para visualização de gráficos")
+
+table <- data.frame(Pacotes=v,Utilização=f)
+
+  knitr::kable(table)
+```
+
+
+# Preparação dos dados {.tabset .title}
+
+Nessa seção você encontrará com detalhes as operações que foram realizadas para normalizar o *dataset*.
+
+## Leitura do dataset {.sub-title}
+
+
+
