@@ -4,7 +4,7 @@ author: "Christian Lira and Wilder Carvalho"
 date: "`r Sys.Date()`"
 output:
   rmdformats::material:
-    css: C:\\Users\\chris\\Documents\\styles.css
+    css: styles.css
 ---
 
 ```{r setup, include=FALSE, cache=TRUE}
