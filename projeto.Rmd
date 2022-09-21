@@ -7,11 +7,13 @@ output:
     css: ./styles.css
 ---
 
-```{r setup, include=FALSE, cache=TRUE}
+```{r setup, include=FALSE, cache=TRUE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 install.packages("rmdformats", repos = "http://cran.us.r-project.org")
 install.packages("knitr", repos = "http://cran.us.r-project.org")
 install.packages("kableExtra", repos = "http://cran.us.r-project.org")
+install.packages("dplyr", repos = "http://cran.us.r-project.org")
+library(dplyr)
 library(rmdformats)
 library(knitr)
 library(kableExtra)
@@ -48,13 +50,13 @@ Os seguintes pacotes serão utilizados no projeto:
 
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 v <- c("library(rmarkdown)", "library(rmdformats)", "library(knitr)", "library(dplyr)", "library(ggplot2)")
 f <- c("utilizado na conversão de arquivo em R em diversos formatos", "customização do template gerado pelo rmarkdown", "para geração de tabelas", "para manipulação avançada dos DataFrames", "para visualização de gráficos")
 
 table <- data.frame(Pacotes=v,Utilização=f)
 
-  knitr::kable(table)
+knitr::kable(table)
 ```
 
 
@@ -66,7 +68,7 @@ Nessa seção você encontrará com detalhes as operações que foram realizadas
 
 A leitura do dataset foi realizada utilizando o seguinte comando, com a base de dados baixada na máquina pessoal:
 
-``` {r}
+``` {r warning=FALSE}
 dataset_path = "dataset/survey_results_public/survey_results_public.csv"
 dataset <- read.csv(dataset_path)
 ```
@@ -75,13 +77,17 @@ Para realizar o download da base, assim como foi descrito na introdução, baixa
 
 ### **Dados carregados**
 
-O dataset possui **`r nrow(dataset)`** linhas e **`r ncol(dataset)`** colunas. Os dados são dispostos da seguinte forma:
+O dataset possui **`r nrow(dataset)`** linhas e **`r ncol(dataset)`** colunas. Inicialmente realizamos um tratamento para remover colunas que só pussuem valores na da seguinte forma:
+```{r warning=FALSE}
+library(dplyr)
+dataset = dataset[colSums(!is.na(dataset)) > 0] %>% select(-ResponseId)
+```
+
+Após o tratamento, o dataset resultante ficou com **`r nrow(dataset)`** linhas e **`r ncol(dataset)`** colunas. Para fim de visualização dos dados, fizemos uma limpeza nos NA presentes sendo dispostos da seguinte forma:
 ```{r warning=FALSE, results='asis'}
 library(knitr)
-kable(head(dataset)) %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-res = dataset %>% filter(colSums(!is.na(df)) > 0)
-nrow(res)
-ncol(res)
+library(kableExtra)
+head(na.omit(dataset)) %>% kable() %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
 
 
