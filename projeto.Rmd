@@ -11,8 +11,10 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 install.packages("rmdformats", repos = "http://cran.us.r-project.org")
 install.packages("knitr", repos = "http://cran.us.r-project.org")
+install.packages("kableExtra", repos = "http://cran.us.r-project.org")
 library(rmdformats)
 library(knitr)
+library(kableExtra)
 ```
 
 # Introdução {.tabset .title}
@@ -65,8 +67,21 @@ Nessa seção você encontrará com detalhes as operações que foram realizadas
 A leitura do dataset foi realizada utilizando o seguinte comando, com a base de dados baixada na máquina pessoal:
 
 ``` {r}
-dataset <- read.csv("dataset/survey_results_public/survey_results_public.csv")
+dataset_path = "dataset/survey_results_public/survey_results_public.csv"
+dataset <- read.csv(dataset_path)
 ```
 
 Para realizar o download da base, assim como foi descrito na introdução, baixa acessar esse [link](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022).
+
+### **Dados carregados**
+
+O dataset possui **`r nrow(dataset)`** linhas e **`r ncol(dataset)`** colunas. Os dados são dispostos da seguinte forma:
+```{r warning=FALSE, results='asis'}
+library(knitr)
+kable(head(dataset)) %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+res = dataset %>% filter(colSums(!is.na(df)) > 0)
+nrow(res)
+ncol(res)
+```
+
 
