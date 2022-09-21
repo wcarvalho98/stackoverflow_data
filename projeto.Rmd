@@ -4,7 +4,7 @@ author: "Christian Lira and Wilder Carvalho"
 date: "`r Sys.Date()`"
 output:
   rmdformats::material:
-    css: styles.css
+    css: ./styles.css
 ---
 
 ```{r setup, include=FALSE, cache=TRUE}
@@ -33,7 +33,7 @@ Por ser uma das ferramentas mais utilizadas, com o propósito de troca de conhec
 
 ## Origem dos dados {.sub-title}
 
-Os dados são provenientes de uma plataforma que reúne diversas bases de dados disponíveis publicamente e de forma gratuita sendo suficiente realizar um cadastro na plataforma. A base de dados se encontra-se aqui: [stack overflow annual-developer survey 2022.]( https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022)
+Os dados são provenientes de uma plataforma que reúne diversas bases de dados disponíveis publicamente e de forma gratuita sendo suficiente realizar um cadastro na plataforma. A base de dados se encontra-se aqui: [stack overflow annual-developer survey 2022.](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022)
 
 
 Esses dados possuem diversas características relacionadas aos desenvolvedores que responderam a pesquisa. Os dados variam desde a educação do desenvolvedor até o hobby dele. Dessa maneira, iremos, neste projeto, realizar uma análise exploratória dos dados de maneira a ranquear os países extraindo características dos desenvolvedores como sua educação, trabalho, salário, experiência e entre outras informações. A partir disso iremos elencar os países desses desenvolvedores em um conjunto de análises de maneira a visualizar pontos como salário médio entre os desenvolvedores ao redor do mundo, educação dos desenvolvedores por país, tecnologias mais utilizadas em cada país, tecnologias que são tendências baseada na vontade do que os desenvolvedores pretendem se especializar no futuro, o uso do StackOverflow por cada tipo de profissional e por cada país, experiência de trabalho baseada no país e densidade de profissionais em cada país.
@@ -62,5 +62,11 @@ Nessa seção você encontrará com detalhes as operações que foram realizadas
 
 ## Leitura do dataset {.sub-title}
 
+A leitura do dataset foi realizada utilizando o seguinte comando, com a base de dados baixada na máquina pessoal:
 
+``` {r}
+dataset <- read.csv("dataset/survey_results_public/survey_results_public.csv")
+```
+
+Para realizar o download da base, assim como foi descrito na introdução, baixa acessar esse [link](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022).
 
