@@ -5,6 +5,9 @@ date: "`r Sys.Date()`"
 output:
   rmdformats::material:
     css: ./styles.css
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE, cache=TRUE, warning=FALSE}
@@ -13,81 +16,220 @@ install.packages("rmdformats", repos = "http://cran.us.r-project.org")
 install.packages("knitr", repos = "http://cran.us.r-project.org")
 install.packages("kableExtra", repos = "http://cran.us.r-project.org")
 install.packages("dplyr", repos = "http://cran.us.r-project.org")
+install.packages("quantmod", repos = "http://cran.us.r-project.org")
+library(tidyr)
 library(dplyr)
 library(rmdformats)
 library(knitr)
 library(kableExtra)
+library(quantmod)
+library(tidyverse)
+library(stringr)
 ```
 
 # Introdução {.tabset .title}
 
-O Stack overflow é uma plataforma gratuita de perguntas e respostas para programadores, estudantes e entusiastas em tecnologia e desenvolvimento. Nele, qualquer usuário pode publicar uma dúvida para ser respondida por outros membros do site. Além disso, a plataforma oferece classificados de empregos na área de tecnologia.
+O Stack overflow é uma plataforma gratuita de perguntas e respostas para
+programadores, estudantes e entusiastas em tecnologia e desenvolvimento.
+Nele, qualquer usuário pode publicar uma dúvida para ser respondida por
+outros membros do site. Além disso, a plataforma oferece classificados
+de empregos na área de tecnologia.
 
 ## Importância {.sub-title}
 
-Trabalhar com desenvolvimento de software exige conhecimento multidisciplinar e estudo. É comum observar que pessoas novatas na área sintam-se frustradas pela quantidade de assuntos paralelos que estão envolvidos no aprendizado de uma “simples” linguagem de programação.
+Trabalhar com desenvolvimento de software exige conhecimento
+multidisciplinar e estudo. É comum observar que pessoas novatas na área
+sintam-se frustradas pela quantidade de assuntos paralelos que estão
+envolvidos no aprendizado de uma "simples" linguagem de programação.
 
-Para um programador Java, por exemplo, espera-se que ele tenha conhecimento de versionamento de código, Programação Orientada a Objetos (POO), modelagem de banco de dados, conexão a banco de dados, frameworks entre diversos outros assuntos que se fossemos citar aqui seria uma lista gigantesca.
+Para um programador Java, por exemplo, espera-se que ele tenha
+conhecimento de versionamento de código, Programação Orientada a Objetos
+(POO), modelagem de banco de dados, conexão a banco de dados, frameworks
+entre diversos outros assuntos que se fossemos citar aqui seria uma
+lista gigantesca.
 
-É humanamente impossível, um indivíduo saber com perfeição todos os tópicos que envolvem um fluxo de desenvolvimento de software. Entramos na Universidade, achando que estamos 100% prontos para resolver qualquer problema complexo no mercado de trabalho, mas a realidade não é essa.
+É humanamente impossível, um indivíduo saber com perfeição todos os
+tópicos que envolvem um fluxo de desenvolvimento de software. Entramos
+na Universidade, achando que estamos 100% prontos para resolver qualquer
+problema complexo no mercado de trabalho, mas a realidade não é essa.
 
-No dia-a-dia no mercado de trabalho, bem como na universidade, frequentemente desenvolvedores de todo o mundo recorrem à internet em busca de dúvidas e, hoje, um dos ambientes mais utilizados é o Stack Overflow, que serve como uma comunidade de programadores, um espaço em que os profissionais/estudantes podem trocar dicas, elencar soluções e esclarecer dúvidas sobre códigos.
+No dia-a-dia no mercado de trabalho, bem como na universidade,
+frequentemente desenvolvedores de todo o mundo recorrem à internet em
+busca de dúvidas e, hoje, um dos ambientes mais utilizados é o Stack
+Overflow, que serve como uma comunidade de programadores, um espaço em
+que os profissionais/estudantes podem trocar dicas, elencar soluções e
+esclarecer dúvidas sobre códigos.
 
-Por ser uma das ferramentas mais utilizadas, com o propósito de troca de conhecimento em programação. Esperamos, inferir através da comunidade de usuários da plataforma, informações como: “Comparativo salarial dos desenvolvedores ao redor do mundo”, “Meios de aprendizagem mais utilizados para aprendizado da programação”, “Gêneros dos profissionais de desenvolvimento por localidade”, “Etnia dos profissionais vs Salário médio”, “Saúde mental dos profissionais”.
+Por ser uma das ferramentas mais utilizadas, com o propósito de troca de
+conhecimento em programação. Esperamos, inferir através da comunidade de
+usuários da plataforma, informações como: "Comparativo salarial dos
+desenvolvedores ao redor do mundo", "Meios de aprendizagem mais
+utilizados para aprendizado da programação", "Gêneros dos profissionais
+de desenvolvimento por localidade", "Etnia dos profissionais vs Salário
+médio", "Saúde mental dos profissionais".
 
 ## Origem dos dados {.sub-title}
 
-Os dados são provenientes de uma plataforma que reúne diversas bases de dados disponíveis publicamente e de forma gratuita sendo suficiente realizar um cadastro na plataforma. A base de dados se encontra-se aqui: [stack overflow annual-developer survey 2022.](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022)
+Os dados são provenientes de uma plataforma que reúne diversas bases de
+dados disponíveis publicamente e de forma gratuita sendo suficiente
+realizar um cadastro na plataforma. A base de dados se encontra-se aqui:
+[stack overflow annual-developer survey
+2022.](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022)
 
-
-Esses dados possuem diversas características relacionadas aos desenvolvedores que responderam a pesquisa. Os dados variam desde a educação do desenvolvedor até o hobby dele. Dessa maneira, iremos, neste projeto, realizar uma análise exploratória dos dados de maneira a ranquear os países extraindo características dos desenvolvedores como sua educação, trabalho, salário, experiência e entre outras informações. A partir disso iremos elencar os países desses desenvolvedores em um conjunto de análises de maneira a visualizar pontos como salário médio entre os desenvolvedores ao redor do mundo, educação dos desenvolvedores por país, tecnologias mais utilizadas em cada país, tecnologias que são tendências baseada na vontade do que os desenvolvedores pretendem se especializar no futuro, o uso do StackOverflow por cada tipo de profissional e por cada país, experiência de trabalho baseada no país e densidade de profissionais em cada país.
-Tais extrações possibilitam uma análise de mercado que pode auxiliar na tomada de decisão de profissionais iniciantes na carreira do desenvolvimento ou até mesmo quem pensa em fazer uma transição de carreira.
+Esses dados possuem diversas características relacionadas aos
+desenvolvedores que responderam a pesquisa. Os dados variam desde a
+educação do desenvolvedor até o hobby dele. Dessa maneira, iremos, neste
+projeto, realizar uma análise exploratória dos dados de maneira a
+ranquear os países extraindo características dos desenvolvedores como
+sua educação, trabalho, salário, experiência e entre outras informações.
+A partir disso iremos elencar os países desses desenvolvedores em um
+conjunto de análises de maneira a visualizar pontos como salário médio
+entre os desenvolvedores ao redor do mundo, educação dos desenvolvedores
+por país, tecnologias mais utilizadas em cada país, tecnologias que são
+tendências baseada na vontade do que os desenvolvedores pretendem se
+especializar no futuro, o uso do StackOverflow por cada tipo de
+profissional e por cada país, experiência de trabalho baseada no país e
+densidade de profissionais em cada país. Tais extrações possibilitam uma
+análise de mercado que pode auxiliar na tomada de decisão de
+profissionais iniciantes na carreira do desenvolvimento ou até mesmo
+quem pensa em fazer uma transição de carreira.
 
 # Pacotes Necessários {.tabset .title}
 
-
 Os seguintes pacotes serão utilizados no projeto:
-
-
 
 ```{r echo=FALSE, warning=FALSE}
 v <- c("library(rmarkdown)", "library(rmdformats)", "library(knitr)", "library(dplyr)", "library(ggplot2)")
 f <- c("utilizado na conversão de arquivo em R em diversos formatos", "customização do template gerado pelo rmarkdown", "para geração de tabelas", "para manipulação avançada dos DataFrames", "para visualização de gráficos")
 
 table <- data.frame(Pacotes=v,Utilização=f)
-
 knitr::kable(table)
 ```
 
-
 # Preparação dos dados {.tabset .title}
 
-Nessa seção você encontrará com detalhes as operações que foram realizadas para normalizar o *dataset*.
+Nessa seção você encontrará com detalhes as operações que foram
+realizadas para normalizar o *dataset*.
 
 ## Leitura do dataset {.sub-title}
 
-A leitura do dataset foi realizada utilizando o seguinte comando, com a base de dados baixada na máquina pessoal:
+A leitura do dataset foi realizada utilizando o seguinte comando, com a
+base de dados baixada na máquina pessoal:
 
 ```{r message=FALSE, warning=FALSE}
 dataset_path = "dataset/survey_results_public/survey_results_public.csv"
 dataset <- read.csv(dataset_path)
 ```
 
-Para realizar o download da base, assim como foi descrito na introdução, baixa acessar esse [link](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022).
+Para realizar o download da base, assim como foi descrito na introdução,
+baixa acessar esse
+[link](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022).
 
 ### **Dados carregados**
 
-O dataset possui **`r nrow(dataset)`** linhas e **`r ncol(dataset)`** colunas. Inicialmente realizamos um tratamento para remover colunas que só pussuem valores na da seguinte forma:
-```{r message=FALSE, warning=FALSE}
-library(dplyr)
+O dataset possui **`r nrow(dataset)`** linhas e **`r ncol(dataset)`**
+colunas. Inicialmente realizamos um tratamento para remover colunas que
+só pussuem valores na da seguinte forma:
+
+```{r message=FALSE, warning=FALSE, cache=TRUE}
 dataset = dataset[colSums(!is.na(dataset)) > 0] %>% select(-ResponseId)
 ```
 
-Após o tratamento, o dataset resultante ficou com **`r nrow(dataset)`** linhas e **`r ncol(dataset)`** colunas. Para fim de visualização dos dados, fizemos uma limpeza nos NA presentes sendo dispostos da seguinte forma:
+Após o tratamento, o dataset resultante ficou com **`r nrow(dataset)`**
+linhas e **`r ncol(dataset)`** colunas. Para fim de visualização dos
+dados, fizemos uma limpeza nos NA presentes sendo dispostos da seguinte
+forma:
+
 ```{r message=FALSE, warning=FALSE, results='asis'}
 library(knitr)
 library(kableExtra)
 head(na.omit(dataset)) %>% kable() %>% kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed")) %>% scroll_box(width = "100%", height = "600px")
+```
+
+# Subsets e análise {.tabset .title}
+
+A partir da limpeza inicial dos dados, eliminando NAs criaremos subsets
+para facilitar a análise feita.
+
+## Comparativo Salarial entre Profissionais por países {.sub-title}
+
+Nesse primeira análise, faremos um novo pré processamento na base
+inicialmente tratada. E criaremos um subset contendo as seguintes
+colunas:
+
+-   MainBranch -\> Que indica a linha de trabalho do usuário do
+    StackOverflow, nesse caso estamos unicamente interessados naqueles que são desenvolvedores, então usaremos os que contém o valor **I am a developer by profession**
+
+-   Country -\> País do usuário
+
+-   Currency -\> Moeda em que é pago.
+
+-   CompTotal -\> Quanto o usuário recebe como pagamento ao total.
+
+-   CompFreq -\> Qual a frequência dessa compensação (mensal ou anual).
+
+```{r message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+firstData <- select(dataset, MainBranch, Country, Currency, CompTotal, CompFreq) %>% dplyr::filter(MainBranch == "I am a developer by profession") %>% drop_na()
+```
+
+Após isso, temos o seguinte subset:
+
+```{r message=FALSE, warning=FALSE, results='asis'}
+library(knitr)
+library(kableExtra)
+head(firstData) %>% kable() %>% kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
+```
+
+A partir desse subset inicial, precisamos converter os valores de pagamento para uma moeda comum, para fins comparativos.
+
+Nesse caso faremos a conversão para dólar **USD** e em seguida converteremos todos os valores de pagamento para o tipo mensal **Monthly**.
+
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyverse)
+library(quantmod)
+
+library(stringr)
+
+
+firstData$Currency <- unlist(lapply(firstData$Currency, str_extract, "^.{3}"))
+
+from <- c("USD")
+
+to <- as.list(levels(as.factor(firstData$Currency)))
+
+rates <- tibble(from = from, 
+                       to = to) %>% 
+  mutate(getQuote(paste0(from, to, "=X")) %>% 
+           select(rate = Last))
+
+currencyCon <- function(x, from = "USD", to = "USD", lookup = rates) {
+  str_replace_all(from, '"', '')
+  values <- lookup$rate
+  
+  names(values) <- lookup$from
+  
+  print(values[to])
+  print(values[from])
+  print(x)
+  print("-------------")
+  values[to] / (values[from] / x)
+}
+
+for (row in 1:nrow(firstData)) {
+    firstData[row, "CompTotal"] <- currencyCon(as.numeric(firstData[row, "CompTotal"]), from = firstData[row, "Currency"])
+    #firstData[row, "Currency"] <- "USD"
+    
+    if(firstData[row, "CompFreq"] == "Monthly") {
+        firstData[row, "CompTotal"] <- as.numeric(firstData[row, "CompTotal"]) * 12
+        firstData[row, "CompFreq"] <- "Yearly"
+    }
+
+}
+  
 ```
 
 
