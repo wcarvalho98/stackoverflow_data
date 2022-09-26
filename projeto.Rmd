@@ -11,20 +11,23 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE, cache=TRUE, warning=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 install.packages("rmdformats", repos = "http://cran.us.r-project.org")
 install.packages("knitr", repos = "http://cran.us.r-project.org")
+install.packages("stringr", repos = "http://cran.us.r-project.org")
+install.packages("tidyverse", repos = "http://cran.us.r-project.org")
 install.packages("kableExtra", repos = "http://cran.us.r-project.org")
 install.packages("dplyr", repos = "http://cran.us.r-project.org")
 install.packages("quantmod", repos = "http://cran.us.r-project.org")
-library(tidyr)
-library(dplyr)
+install.packages("tidyr", repos = "http://cran.us.r-project.org")
 library(rmdformats)
 library(knitr)
-library(kableExtra)
-library(quantmod)
-library(tidyverse)
 library(stringr)
+library(tidyverse)
+library(kableExtra)
+library(dplyr)
+library(quantmod)
+library(tidyr)
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Introdução {.tabset .title}
@@ -141,8 +144,6 @@ dados, fizemos uma limpeza nos NA presentes sendo dispostos da seguinte
 forma:
 
 ```{r message=FALSE, warning=FALSE, results='asis'}
-library(knitr)
-library(kableExtra)
 head(na.omit(dataset)) %>% kable() %>% kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed")) %>% scroll_box(width = "100%", height = "600px")
 ```
 
@@ -169,16 +170,12 @@ colunas:
 -   CompFreq -\> Qual a frequência dessa compensação (mensal ou anual).
 
 ```{r message=FALSE, warning=FALSE}
-library(tidyr)
-library(dplyr)
 firstData <- select(dataset, MainBranch, Country, Currency, CompTotal, CompFreq) %>% dplyr::filter(MainBranch == "I am a developer by profession") %>% drop_na()
 ```
 
 Após isso, temos o seguinte subset:
 
 ```{r message=FALSE, warning=FALSE, results='asis'}
-library(knitr)
-library(kableExtra)
 head(firstData) %>% kable() %>% kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
 ```
 
@@ -188,13 +185,6 @@ Nesse caso faremos a conversão para dólar **USD** e em seguida converteremos t
 
 
 ```{r message=FALSE, warning=FALSE}
-library(dplyr)
-library(tidyverse)
-library(quantmod)
-
-library(stringr)
-
-
 firstData$Currency <- unlist(lapply(firstData$Currency, str_extract, "^.{3}"))
 
 from <- c("USD")
@@ -211,11 +201,7 @@ currencyCon <- function(x, from = "USD", to = "USD", lookup = rates) {
   values <- lookup$rate
   
   names(values) <- lookup$from
-  
-  print(values[to])
-  print(values[from])
-  print(x)
-  print("-------------")
+
   values[to] / (values[from] / x)
 }
 
