@@ -19,6 +19,7 @@ install.packages("kableExtra", repos = "http://cran.us.r-project.org")
 install.packages("dplyr", repos = "http://cran.us.r-project.org")
 install.packages("quantmod", repos = "http://cran.us.r-project.org")
 install.packages("tidyr", repos = "http://cran.us.r-project.org")
+install.packages("magrittr", repos = "http://cran.us.r-project.org")
 library(rmdformats)
 library(knitr)
 library(stringr)
@@ -27,6 +28,7 @@ library(kableExtra)
 library(dplyr)
 library(quantmod)
 library(tidyr)
+library(magrittr)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -135,7 +137,7 @@ colunas. Inicialmente realizamos um tratamento para remover colunas que
 só pussuem valores na da seguinte forma:
 
 ```{r message=FALSE, warning=FALSE, cache=TRUE}
-dataset = dataset[colSums(!is.na(dataset)) > 0] %>% select(-ResponseId)
+dataset = dataset[colSums(!is.na(dataset)) > 0] %>% select(-ResponseId) %>% filter(MainBranch == "I am a developer by profession")
 ```
 
 Após o tratamento, o dataset resultante ficou com **`r nrow(dataset)`**
@@ -143,8 +145,10 @@ linhas e **`r ncol(dataset)`** colunas. Para fim de visualização dos
 dados, fizemos uma limpeza nos NA presentes sendo dispostos da seguinte
 forma:
 
-```{r message=FALSE, warning=FALSE, results='asis'}
-head(na.omit(dataset)) %>% kable() %>% kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed")) %>% scroll_box(width = "100%", height = "600px")
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+knitr::kable(head(na.omit(dataset))) %>% 
+  kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed")) %>% 
+  scroll_box(width = "100%", height = "600px")
 ```
 
 # Subsets e análise {.tabset .title}
@@ -170,13 +174,15 @@ colunas:
 -   CompFreq -\> Qual a frequência dessa compensação (mensal ou anual).
 
 ```{r message=FALSE, warning=FALSE}
-firstData <- select(dataset, MainBranch, Country, Currency, CompTotal, CompFreq) %>% dplyr::filter(MainBranch == "I am a developer by profession") %>% drop_na()
+firstData <- select(dataset, MainBranch, Country, Currency, CompTotal, CompFreq) %>% drop_na()
 ```
 
 Após isso, temos o seguinte subset:
 
 ```{r message=FALSE, warning=FALSE, results='asis'}
-head(firstData) %>% kable() %>% kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
+head(firstData) %>% 
+  kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
 ```
 
 A partir desse subset inicial, precisamos converter os valores de pagamento para uma moeda comum, para fins comparativos.
@@ -218,4 +224,47 @@ for (row in 1:nrow(firstData)) {
   
 ```
 
+## Comparativo da educação dos desenvolvedores por país {.sub-title}
 
+Nessa seção iremos fazer um comparativo do nível educacional dos desenvolvedores baseado em seu país de nascença. Para isso teremos que coletar as colunas "EdLevel" e "Country" as quais correspondem, respectivamente, ao nível de educação e o país de origem do desenvolvedor.
+O seguinte código ira gerar um subset com a educação de cada desenvolvedor da base e uma correlação com seu país de origem:
+
+```{r message=FALSE, warning=FALSE}
+education_country <- dataset %>% select(EdLevel, Country) %>% drop_na()
+```
+
+Após isso, temos o seguinte subset:
+
+```{r message=FALSE, warning=FALSE, results='asis'}
+head(education_country) %>% 
+  kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
+```
+
+Como podemos observar, existem alguns tipos diferentes de educação e, para isso iremos quantificar cada tipo de educação para os 10 paises que possuem mais desenvolvedores da seguinte maneira:
+
+```{r message=FALSE, warning=FALSE}
+education_country$EdLevel <- as.factor(education_country$EdLevel)
+education_country$Country <- as.factor(education_country$Country)
+
+countries <- as.list(levels(education_country$Country))
+dev_by_country = data.frame()
+
+for (row in 1:length(countries)) {
+  dev_by_country[row, "Devs"] <- nrow(education_country %>% filter(Country == countries[row]))
+  dev_by_country[row, "Country"] <- countries[row]
+}
+
+education_levels = as.list(levels(education_country$EdLevel))
+dev_by_country = dev_by_country %>% arrange(desc(Devs)) %>% slice_head(n = 10)
+
+res = data.frame(matrix(nrow = nrow(dev_by_country), ncol = length(education_levels)))
+rownames(res) = dev_by_country$Country
+colnames(res) = education_levels
+
+for (row in rownames(res)) {
+  for (col in colnames(res)) {
+    res[row, col] = nrow(education_country %>% filter(Country == row, EdLevel == col))
+  }
+}
+```
