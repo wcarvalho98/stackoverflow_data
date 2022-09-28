@@ -163,7 +163,9 @@ inicialmente tratada. E criaremos um subset contendo as seguintes
 colunas:
 
 -   MainBranch -\> Que indica a linha de trabalho do usuário do
-    StackOverflow, nesse caso estamos unicamente interessados naqueles que são desenvolvedores, então usaremos os que contém o valor **I am a developer by profession**
+    StackOverflow, nesse caso estamos unicamente interessados naqueles
+    que são desenvolvedores, então usaremos os que contém o valor **I am
+    a developer by profession**
 
 -   Country -\> País do usuário
 
@@ -185,10 +187,12 @@ head(firstData) %>%
   kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
 ```
 
-A partir desse subset inicial, precisamos converter os valores de pagamento para uma moeda comum, para fins comparativos.
+A partir desse subset inicial, precisamos converter os valores de
+pagamento para uma moeda comum, para fins comparativos.
 
-Nesse caso faremos a conversão para dólar **USD** e em seguida converteremos todos os valores de pagamento para o tipo mensal **Monthly**.
-
+Nesse caso faremos a conversão para dólar **USD** e em seguida
+converteremos todos os valores de pagamento para o tipo mensal
+**Monthly**.
 
 ```{r message=FALSE, warning=FALSE}
 firstData$Currency <- unlist(lapply(firstData$Currency, str_extract, "^.{3}"))
@@ -226,8 +230,12 @@ for (row in 1:nrow(firstData)) {
 
 ## Comparativo da educação dos desenvolvedores por país {.sub-title}
 
-Nessa seção iremos fazer um comparativo do nível educacional dos desenvolvedores baseado em seu país de nascença. Para isso teremos que coletar as colunas "EdLevel" e "Country" as quais correspondem, respectivamente, ao nível de educação e o país de origem do desenvolvedor.
-O seguinte código ira gerar um subset com a educação de cada desenvolvedor da base e uma correlação com seu país de origem:
+Nessa seção iremos fazer um comparativo do nível educacional dos
+desenvolvedores baseado em seu país de nascença. Para isso teremos que
+coletar as colunas "EdLevel" e "Country" as quais correspondem,
+respectivamente, ao nível de educação e o país de origem do
+desenvolvedor. O seguinte código ira gerar um subset com a educação de
+cada desenvolvedor da base e uma correlação com seu país de origem:
 
 ```{r message=FALSE, warning=FALSE}
 education_country <- dataset %>% select(EdLevel, Country) %>% drop_na()
@@ -241,7 +249,9 @@ head(education_country) %>%
   kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
 ```
 
-Como podemos observar, existem alguns tipos diferentes de educação e, para isso iremos quantificar cada tipo de educação para os 10 paises que possuem mais desenvolvedores da seguinte maneira:
+Como podemos observar, existem alguns tipos diferentes de educação e,
+para isso iremos quantificar cada tipo de educação para os 10 paises que
+possuem mais desenvolvedores da seguinte maneira:
 
 ```{r message=FALSE, warning=FALSE}
 education_country$EdLevel <- as.factor(education_country$EdLevel)
@@ -267,4 +277,34 @@ for (row in rownames(res)) {
     res[row, col] = nrow(education_country %>% filter(Country == row, EdLevel == col))
   }
 }
+
+final_result = data.frame(matrix(nrow = nrow(res) * ncol(res), ncol = 3))
+colnames(final_result) = c("Country", "EdLevel", "Devs")
+
+for (row in 1:nrow(res)) {
+  for (col in 1:ncol(res)) {
+    actualRow = col + (row - 1) * ncol(res)
+    final_result[actualRow, "Country"] = rownames(res)[row]
+    final_result[actualRow, "EdLevel"] = colnames(res)[col]
+    final_result[actualRow, "Devs"] = res[row, col]
+  }
+}
+```
+
+Após prepararmos os dados e armazená-los é suficiente a amostragem dos
+dados por meio de uma tabela reprensentando os 10 países que tem mais
+desenvolvedores e seu nível de educação:
+
+```{r message=FALSE, warning=FALSE, results='asis'}
+ggplot(final_result, aes(x=Country, y=Devs, group=EdLevel)) + 
+  geom_line(aes(linetype=EdLevel, color=EdLevel)) + geom_point(aes(color=EdLevel)) + theme_minimal() +
+  scale_color_viridis_d(option = "plasma") +
+  theme(legend.key.size = unit(0.4, "cm"), 
+        legend.margin = margin(1, 1, 1, 1),
+        legend.position = "bottom",
+        legend.direction = "horizontal")
+#res %>% 
+#  kable() %>% 
+#  kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed")) %>% 
+#  scroll_box(width = "100%", height = "600px")
 ```
