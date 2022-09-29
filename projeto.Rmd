@@ -308,3 +308,23 @@ ggplot(final_result, aes(x=Country, y=Devs, group=EdLevel)) +
 #  kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed")) %>% 
 #  scroll_box(width = "100%", height = "600px")
 ```
+
+# Comparativo entre homens e mulheres como desenvolvedores
+
+Nesta seção iremos fazer um comparativo entre homens e mulheres no mundo do desenvolvimento. Para isso iremos tratar o nosso dataset de maneira a remover todos as respostas inválidas (NA). Em seguida podemos extrair diversos dados como a quantidade total de pessoas que declararam seu sexo, a quantidade de homens, mulheres, trans homens e trans mulheres assim como homens e mulheres transexuais da seguinte forma:
+
+```{r message=FALSE, warning=FALSE}
+gender_dataset = dataset %>% filter(!is.na(Gender)) %>% select(Gender, Trans, Sexuality) %>% drop_na()
+gender_dataset = gender_dataset %>% filter(Gender == "Man" | Gender == "Woman", Trans == "Yes" | Trans == "No", Sexuality == "Straight / Heterosexual" | Sexuality == "Gay or Lesbian" | Sexuality == "Bisexual")
+gender = data.frame(count = (gender_dataset %>% summarise(n()))[1,1], man_count = (gender_dataset %>% summarise(sum(Gender == "Man")))[1,1], woman_count = (gender_dataset %>% summarise(sum(Gender == "Woman")))[1,1])
+gender$man.straight_count = (gender_dataset %>% filter(Gender == "Man", Sexuality == "Straight / Heterosexual") %>% summarise(n()))[1,1]
+gender$woman.straight_count = (gender_dataset %>% filter(Gender == "Woman", Sexuality == "Straight / Heterosexual") %>% summarise(n()))[1,1]
+gender$man.trans_count = (gender_dataset %>% filter(Gender == "Man", Trans == "Yes") %>% summarise(n()))[1,1]
+gender$woman.trans_count = (gender_dataset %>% filter(Gender == "Woman", Trans == "Yes") %>% summarise(n()))[1,1]
+```
+
+A partir desses dados podemos representar esses dados de uma forma visual, como podemos ver no seguinte gráfico:
+
+```{r message=FALSE, warning=FALSE}
+ggplot(gender_dataset, aes(x=gender_dataset$Gender, y=gender_dataset$Sexuality))
+```
