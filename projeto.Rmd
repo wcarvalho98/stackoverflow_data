@@ -165,72 +165,42 @@ Nessa primeira análise, faremos um novo pré processamento na base
 inicialmente tratada. E criaremos um subset contendo as seguintes
 colunas:
 
--   MainBranch -\> Que indica a linha de trabalho do usuário do
-    StackOverflow, nesse caso estamos unicamente interessados naqueles
-    que são desenvolvedores, então usaremos os que contém o valor **I am
-    a developer by profession**
-
 -   Country -\> País do usuário
 
--   Currency -\> Moeda em que é pago.
+-   ConvertedCompYearly -\> Quanto o usuário recebe como pagamento anual total em **USD**.
 
--   CompTotal -\> Quanto o usuário recebe como pagamento ao total.
+-   Levaremos em consideração valor de compensação anual para de no mínimo mil USD e no máximo 2 milhões USD
 
--   CompFreq -\> Qual a frequência dessa compensação (mensal ou anual).
-
-```{r message=FALSE, warning=FALSE}
-firstData <- select(dataset, MainBranch, Country, Currency, CompTotal, CompFreq) %>% tidyr::drop_na()
+```{r message=FALSE, cache=TRUE, warning=FALSE}
+firstData <- select(dataset, Country, ConvertedCompYearly) %>% dplyr::filter(ConvertedCompYearly >= 1000 & ConvertedCompYearly <= 2000000) %>% drop_na()
 ```
 
-Após isso, obtemos o seguinte subset:
-
-```{r message=FALSE, warning=FALSE, results='asis'}
-head(firstData) %>% 
-  kableExtra::kable() %>% 
-  kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
-```
-
-A partir desse subset inicial, precisamos converter os valores de
-pagamento para uma moeda comum, para fins comparativos.
-
-Nesse caso faremos a conversão para dólar **USD** e em seguida
-converteremos todos os valores de pagamento para o tipo mensal
-**Monthly**.
-
-```{r message=FALSE, warning=FALSE}
-library(stringr)
-firstData$Currency <- unlist(lapply(firstData$Currency, str_extract, "^.{3}"))
-
-from <- c("USD")
-
-to <- as.list(levels(as.factor(firstData$Currency)))
-
-rates <- tibble(from = from, 
-                       to = to) %>% 
-  mutate(getQuote(paste0(from, to, "=X")) %>% 
-           select(rate = Last))
-
-currencyCon <- function(x, from = "USD", to = "USD", lookup = rates) {
-  str_replace_all(from, '"', '')
-  values <- lookup$rate
+Após isso, temos o seguinte subset:
   
-  names(values) <- lookup$from
-
-  values[to] / (values[from] / x)
-}
-
-for (row in 1:nrow(firstData)) {
-    firstData[row, "CompTotal"] <- currencyCon(as.numeric(firstData[row, "CompTotal"]), from = firstData[row, "Currency"])
-    #firstData[row, "Currency"] <- "USD"
-    
-    if(firstData[row, "CompFreq"] == "Monthly") {
-        firstData[row, "CompTotal"] <- as.numeric(firstData[row, "CompTotal"]) * 12
-        firstData[row, "CompFreq"] <- "Yearly"
-    }
-
-}
-  
+```{r message=FALSE, cache=TRUE, warning=FALSE, results='asis'}
+head(firstData, 10) %>% kable() %>% kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
 ```
+
+E então, tiraremos a mediana salarial dos dez países com mais respostas ao questionário do Stack Overflow.
+Vale salientar, que escolhemos a mediana pois, 
+  
+```{r message=FALSE, cache=TRUE, warning=FALSE, results='asis', fig.height=7, fig.width=7}
+
+df <- firstData %>% 
+  group_by(Country) %>% mutate(median = median(ConvertedCompYearly), count = n()) %>% group_by(Country, median, count) %>% tally(sort = TRUE)
+
+
+ggplot(data = head(df, 10), aes(x = median, y = Country, fill = "red")) +
+  geom_bar(stat='identity', show.legend = FALSE) +
+  theme_minimal() +
+  ggtitle("Mediana salarial anual em USD por Pais") +
+  ylab('Paises') + xlab('Mediana salarial')  + 
+  geom_text(aes(label=median),hjust = -0.2, color="black",
+            position = position_dodge(0.9), size=3.5) + xlim(c(0,200000)) 
+
+
+```
+Notamos pelo gráfico acima, através do estudo da mediana que os desenvolvedores são melhores remunerados nos Estados Unidos, o que faz sentido, tendo em vista que é o local onde encontram-se as gigantes da tecnologia. No entanto, como o trabalho de desenvolvedor pode ser realizado de forma remota, é possível que desenvolvedores de outros países trabalhem em gigantes localizadas nos Estados Unidos, ou em países do primeiro mundo, o que com toda certeza influencia a remuneração anual.
 
 ## Comparativo da educação dos desenvolvedores por país {.sub-title}
 
