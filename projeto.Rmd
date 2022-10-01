@@ -1,6 +1,6 @@
 ---
-title: "Projeto"
-author: "Christian Lira and Wilder Carvalho"
+title: "Análise sobre dados de desenvolvedores(as) ao redor do mundo"
+author: "Christian Lira e Wilder Carvalho"
 date: "`r Sys.Date()`"
 output:
   rmdformats::material:
@@ -11,6 +11,8 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE, cache=TRUE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("rlang", repos = "http://cran.us.r-project.org")
 install.packages("rmdformats", repos = "http://cran.us.r-project.org")
 install.packages("knitr", repos = "http://cran.us.r-project.org")
 install.packages("stringr", repos = "http://cran.us.r-project.org")
@@ -19,17 +21,16 @@ install.packages("kableExtra", repos = "http://cran.us.r-project.org")
 install.packages("dplyr", repos = "http://cran.us.r-project.org")
 install.packages("quantmod", repos = "http://cran.us.r-project.org")
 install.packages("tidyr", repos = "http://cran.us.r-project.org")
-install.packages("magrittr", repos = "http://cran.us.r-project.org")
+install.packages("stringr", repos = "http://cran.us.r-project.org")
+library(stringr)
 library(rmdformats)
 library(knitr)
-library(stringr)
+library(rlang)
 library(tidyverse)
 library(kableExtra)
 library(dplyr)
 library(quantmod)
 library(tidyr)
-library(magrittr)
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Introdução {.tabset .title}
@@ -78,34 +79,34 @@ médio", "Saúde mental dos profissionais".
 Os dados são provenientes de uma plataforma que reúne diversas bases de
 dados disponíveis publicamente e de forma gratuita sendo suficiente
 realizar um cadastro na plataforma. A base de dados se encontra-se aqui:
-[stack overflow annual-developer survey
-2022.](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022)
+[link do database stack-overflow
+2022](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022).
+Esse database possue diversas características relacionadas aos
+desenvolvedores que responderam a pesquisa do StackOverflow em 2022.
 
-Esses dados possuem diversas características relacionadas aos
-desenvolvedores que responderam a pesquisa. Os dados variam desde a
-educação do desenvolvedor até o hobby dele. Dessa maneira, iremos, neste
-projeto, realizar uma análise exploratória dos dados de maneira a
-ranquear os países extraindo características dos desenvolvedores como
-sua educação, trabalho, salário, experiência e entre outras informações.
+Os dados variam desde a educação do desenvolvedor até o hobby dele.
+Dessa maneira, iremos, neste projeto, realizar uma análise exploratória
+dos dados extraindo características dos desenvolvedores como sua
+educação, trabalho, salário entre outra(s) característica(s).
+
 A partir disso iremos elencar os países desses desenvolvedores em um
 conjunto de análises de maneira a visualizar pontos como salário médio
 entre os desenvolvedores ao redor do mundo, educação dos desenvolvedores
-por país, tecnologias mais utilizadas em cada país, tecnologias que são
-tendências baseada na vontade do que os desenvolvedores pretendem se
-especializar no futuro, o uso do StackOverflow por cada tipo de
-profissional e por cada país, experiência de trabalho baseada no país e
-densidade de profissionais em cada país. Tais extrações possibilitam uma
-análise de mercado que pode auxiliar na tomada de decisão de
-profissionais iniciantes na carreira do desenvolvimento ou até mesmo
-quem pensa em fazer uma transição de carreira.
+por país, experiência de trabalho baseada no sexo e densidade de
+profissionais em cada país.
+
+Tais extrações possibilitam uma análise de mercado que pode auxiliar na
+tomada de decisão de profissionais iniciantes na carreira do
+desenvolvimento ou até mesmo quem pensa em fazer uma transição de
+carreira.
 
 # Pacotes Necessários {.tabset .title}
 
 Os seguintes pacotes serão utilizados no projeto:
 
 ```{r echo=FALSE, warning=FALSE}
-v <- c("library(rmarkdown)", "library(rmdformats)", "library(knitr)", "library(dplyr)", "library(ggplot2)")
-f <- c("utilizado na conversão de arquivo em R em diversos formatos", "customização do template gerado pelo rmarkdown", "para geração de tabelas", "para manipulação avançada dos DataFrames", "para visualização de gráficos")
+v <- c("library(stringr)","library(rmdformats)","library(knitr)","library(rlang)","library(tidyverse)","library(kableExtra)","library(dplyr)","library(quantmod)","library(tidyr)")
+f <- c("Utilizada para manipulação de strings","Customização do template gerado pelo rmarkdown","Para geração de tabelas","Resolução de dependencias","Para manipulação avançada de DataFrames","Customização de tabelas do knitr::kable()","Para manipulação avançada de DataFrames","Utilizado para processamento de dados financeiros","Para manipulação avançada de DataFrames")
 
 table <- data.frame(Pacotes=v,Utilização=f)
 knitr::kable(table)
@@ -140,15 +141,17 @@ só pussuem valores na da seguinte forma:
 dataset = dataset[colSums(!is.na(dataset)) > 0] %>% select(-ResponseId) %>% filter(MainBranch == "I am a developer by profession")
 ```
 
-Após o tratamento, o dataset resultante ficou com **`r nrow(dataset)`**
-linhas e **`r ncol(dataset)`** colunas. Para fim de visualização dos
-dados, fizemos uma limpeza nos NA presentes sendo dispostos da seguinte
-forma:
+Após o tratamento, onde filtramos apenas pelas pessoas que exercem a
+profissão de desenvolvedor, o dataset resultante ficou com
+**`r nrow(dataset)`** linhas e **`r ncol(dataset)`** colunas. Para fim
+de visualização dos dados, fizemos uma limpeza nos NA presentes sendo
+dispostos da seguinte forma:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+library(dplyr)
 knitr::kable(head(na.omit(dataset))) %>% 
   kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed")) %>% 
-  scroll_box(width = "100%", height = "600px")
+  kableExtra::scroll_box(width = "100%", height = "600px")
 ```
 
 # Subsets e análise {.tabset .title}
@@ -158,7 +161,7 @@ para facilitar a análise feita.
 
 ## Comparativo Salarial entre Profissionais por países {.sub-title}
 
-Nesse primeira análise, faremos um novo pré processamento na base
+Nessa primeira análise, faremos um novo pré processamento na base
 inicialmente tratada. E criaremos um subset contendo as seguintes
 colunas:
 
@@ -176,14 +179,14 @@ colunas:
 -   CompFreq -\> Qual a frequência dessa compensação (mensal ou anual).
 
 ```{r message=FALSE, warning=FALSE}
-firstData <- select(dataset, MainBranch, Country, Currency, CompTotal, CompFreq) %>% drop_na()
+firstData <- select(dataset, MainBranch, Country, Currency, CompTotal, CompFreq) %>% tidyr::drop_na()
 ```
 
-Após isso, temos o seguinte subset:
+Após isso, obtemos o seguinte subset:
 
 ```{r message=FALSE, warning=FALSE, results='asis'}
 head(firstData) %>% 
-  kable() %>% 
+  kableExtra::kable() %>% 
   kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
 ```
 
@@ -195,6 +198,7 @@ converteremos todos os valores de pagamento para o tipo mensal
 **Monthly**.
 
 ```{r message=FALSE, warning=FALSE}
+library(stringr)
 firstData$Currency <- unlist(lapply(firstData$Currency, str_extract, "^.{3}"))
 
 from <- c("USD")
@@ -241,7 +245,7 @@ cada desenvolvedor da base e uma correlação com seu país de origem:
 education_country <- dataset %>% select(EdLevel, Country) %>% drop_na()
 ```
 
-Após isso, temos o seguinte subset:
+Após isso, obtemos o seguinte subset:
 
 ```{r message=FALSE, warning=FALSE, results='asis'}
 head(education_country) %>% 
@@ -249,9 +253,9 @@ head(education_country) %>%
   kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
 ```
 
-Como podemos observar, existem alguns tipos diferentes de educação e,
-para isso iremos quantificar cada tipo de educação para os 10 paises que
-possuem mais desenvolvedores da seguinte maneira:
+De maneira a facilitar a construção dos dados de forma visual, criaremos
+um subset elencando apenas os 10 países com maior quantidade de
+desenvolvedores da seguinte forma:
 
 ```{r message=FALSE, warning=FALSE}
 education_country$EdLevel <- as.factor(education_country$EdLevel)
@@ -266,55 +270,40 @@ for (row in 1:length(countries)) {
 }
 
 education_levels = as.list(levels(education_country$EdLevel))
-dev_by_country = dev_by_country %>% arrange(desc(Devs)) %>% slice_head(n = 10)
+dev_by_country = dev_by_country %>% arrange(desc(Devs)) %>% slice_head(n = 5)
 
-res = data.frame(matrix(nrow = nrow(dev_by_country), ncol = length(education_levels)))
-rownames(res) = dev_by_country$Country
-colnames(res) = education_levels
-
-for (row in rownames(res)) {
-  for (col in colnames(res)) {
-    res[row, col] = nrow(education_country %>% filter(Country == row, EdLevel == col))
+data = data.frame()
+for (education in education_levels) {
+  for (country in dev_by_country$Country) {
+    temp = data.frame(ed_level = education, country = country, 
+                      count = nrow(education_country %>% 
+                                     filter(EdLevel == education, 
+                                            Country == country)))
+    data = rbind(data, temp)
   }
 }
 
-final_result = data.frame(matrix(nrow = nrow(res) * ncol(res), ncol = 3))
-colnames(final_result) = c("Country", "EdLevel", "Devs")
+colors = rainbow(5)
+x = barplot(matrix(data$count, nrow = 5, ncol = 9), main="Relação países x nível educacional", names.arg=education_levels, xlab="Nível educacional", ylab="Quantidade de desenvolvedores", col=colors, beside = T, las=2,cex.names=0.65,cex.lab=0.65)
 
-for (row in 1:nrow(res)) {
-  for (col in 1:ncol(res)) {
-    actualRow = col + (row - 1) * ncol(res)
-    final_result[actualRow, "Country"] = rownames(res)[row]
-    final_result[actualRow, "EdLevel"] = colnames(res)[col]
-    final_result[actualRow, "Devs"] = res[row, col]
-  }
-}
+legend("topright",pch = 15,col=colors,legend=dev_by_country$Country)
 ```
 
-Após prepararmos os dados e armazená-los é suficiente a amostragem dos
-dados por meio de uma tabela reprensentando os 10 países que tem mais
-desenvolvedores e seu nível de educação:
+## Qual a relação entre homens e mulheres na área de TI?
 
-```{r message=FALSE, warning=FALSE, results='asis'}
-ggplot(final_result, aes(x=Country, y=Devs, group=EdLevel)) + 
-  geom_line(aes(linetype=EdLevel, color=EdLevel)) + geom_point(aes(color=EdLevel)) + theme_minimal() +
-  scale_color_viridis_d(option = "plasma") +
-  theme(legend.key.size = unit(0.4, "cm"), 
-        legend.margin = margin(1, 1, 1, 1),
-        legend.position = "bottom",
-        legend.direction = "horizontal")
-#res %>% 
-#  kable() %>% 
-#  kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed")) %>% 
-#  scroll_box(width = "100%", height = "600px")
-```
-
-# Comparativo entre homens e mulheres como desenvolvedores
-
-Nesta seção iremos fazer um comparativo entre homens e mulheres no mundo do desenvolvimento. Para isso iremos tratar o nosso dataset de maneira a remover todos as respostas inválidas (NA). Em seguida podemos extrair diversos dados como a quantidade total de pessoas que declararam seu sexo, a quantidade de homens, mulheres, trans homens e trans mulheres assim como homens e mulheres transexuais da seguinte forma:
+Nesta seção iremos fazer um comparativo entre homens e mulheres no mundo
+do desenvolvimento. Para isso iremos tratar o nosso dataset de maneira a
+remover todos as respostas inválidas (NA). Em seguida iremos extrair
+diversos dados como a quantidade total de pessoas que declararam seu
+sexo, a quantidade de homens e mulheres e analisar os seus efeitos na
+área da tecnologia ao redor do mundo assim como tentar identificar
+relações de causa e efeito nos cenários descobertos:
 
 ```{r message=FALSE, warning=FALSE}
-gender_dataset = dataset %>% filter(!is.na(Gender)) %>% select(Gender, Trans, Sexuality) %>% drop_na()
+gender_dataset = dataset %>% filter(!is.na(Gender)) %>%
+  select(Gender, Trans, Sexuality, YearsCode, ConvertedCompYearly) %>%
+  filter(ConvertedCompYearly <= 2000000 & ConvertedCompYearly > 1000) %>%
+  drop_na()
 gender_dataset = gender_dataset %>% filter(Gender == "Man" | Gender == "Woman", Trans == "Yes" | Trans == "No", Sexuality == "Straight / Heterosexual" | Sexuality == "Gay or Lesbian" | Sexuality == "Bisexual")
 gender = data.frame(count = (gender_dataset %>% summarise(n()))[1,1], man_count = (gender_dataset %>% summarise(sum(Gender == "Man")))[1,1], woman_count = (gender_dataset %>% summarise(sum(Gender == "Woman")))[1,1])
 gender$man.straight_count = (gender_dataset %>% filter(Gender == "Man", Sexuality == "Straight / Heterosexual") %>% summarise(n()))[1,1]
@@ -323,8 +312,77 @@ gender$man.trans_count = (gender_dataset %>% filter(Gender == "Man", Trans == "Y
 gender$woman.trans_count = (gender_dataset %>% filter(Gender == "Woman", Trans == "Yes") %>% summarise(n()))[1,1]
 ```
 
-A partir desses dados podemos representar esses dados de uma forma visual, como podemos ver no seguinte gráfico:
+Primeiramente podemos fazer uma análise básica a respeito do mercado de
+tecnologia: a distribuição de homens e mulheres que responderam à
+pesquisa. No gráfico a seguir podemos ver como se comporta esses dados:
 
 ```{r message=FALSE, warning=FALSE}
-ggplot(gender_dataset, aes(x=gender_dataset$Gender, y=gender_dataset$Sexuality))
+library(ggplot2)
+
+# Criação do data frame para o gráfico
+data <- data.frame(
+  group=c("Homem", "Mulher"),
+  value=c(gender$man_count, gender$woman_count)
+)
+
+# Computação das posições dos labels no gráfico
+data <- data %>% 
+  arrange(desc(group)) %>%
+  mutate(prop = value / sum(data$value)*100) %>%
+  mutate(ypos = cumsum(prop)- 0.5*prop) %>%
+  mutate(percentage = paste(round((value / gender$count) * 100, 2), "%", sep = ""))
+
+# Criação do gráfico de pizza
+ggplot(data, aes(x="", y=prop, fill=group)) +
+  geom_bar(stat="identity", width=1, color="white") +
+  coord_polar("y", start=0) +
+  theme_void() + 
+  theme(legend.position="right") +
+  labs(fill="Genero") +
+  geom_text(aes(y=ypos, label=percentage), color = "white", size=5) +
+  scale_fill_brewer(palette="Set1")
 ```
+
+É visível a discrepância entre homens e mulheres na área de tecnologia.
+Infelizmente isso se reflete na área em si onde é observável uma grande
+quantia de homens em detrimento das mulheres, fruto de uma ideologia de
+desigualdade de gênero ao redor do mundo como podemos observar nessa
+[matéria](https://www.computerweekly.com/br/reportagen/Estatisticas-sobre-mulheres-em-tecnologia-Ultimas-pesquisas-e-tendencias "Estatística sobre mulheres em tecnologia").
+
+Entretanto, para entendermos a razão desse cenário de desigualdade
+precisamos investigar as relações de causa e efeito que tornam isso uma
+realidade. Para isso irei analisar o tempo de experiência médio entre o
+público feminino e masculino assim como a média salarial:
+
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+
+# Criação do data frame para o gráfico
+data <- data.frame(
+  group=c("Homem", "Mulher"),
+  value=c((gender_dataset %>% filter(Gender == "Man") %>% summarise(mean(ConvertedCompYearly)))[1,1], (gender_dataset %>% filter(Gender == "Woman") %>% summarise(mean(ConvertedCompYearly)))[1,1]),
+  exp_mean=c((gender_dataset %>% filter(Gender == "Man") %>% summarise(mean(as.integer(YearsCode), na.rm = T)))[1,1],
+             (gender_dataset %>% filter(Gender == "Woman") %>% summarise(mean(as.integer(YearsCode), na.rm = T)))[1,1]))
+
+data$value = round(data$value / 1000, 2)
+data$exp_mean = round(data$exp_mean, 2)
+
+colors = rainbow(2)
+barplot(as.matrix(data %>% select(-group)), main="Comparativo salário médio x experiência média",names.arg=c("Salario (x1000)", "Experiencia"), ylab="Quantidade", col=colors, beside = T)
+
+legend("topright",pch = 15,col=colors,legend=data$group)
+```
+
+### **Análise de comportamento**
+
+Nos gráficos acima podemos visualizar que, enquanto temos uma grandia
+quantia de homens na área de TI, as mulheres representam uma parcela
+quase inexistente. Ao vermos como se comporta o gráfico salarial médio
+podemos notar que as mulheres recebem bem menos que os homens no
+comparativo anual enquanto possuem um tempo de experiência médio se
+comparado aos homens.
+
+Claramente isso torna a área menos atrativa para as mulheres que, não só
+são desestimuladas no nível social a exercerem profissões relacionadas a
+TI assim como elas tendem a ganhar menos mesmo quando possuem um tempo
+de experiência igual ou próximo ao de um homem.
