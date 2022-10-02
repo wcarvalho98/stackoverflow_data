@@ -1,5 +1,5 @@
 ---
-title: "Análise sobre dados de desenvolvedores(as) ao redor do mundo"
+title: "Análise sobre dados de desenvolvedores ao redor do mundo"
 author: "Christian Lira e Wilder Carvalho"
 date: "`r Sys.Date()`"
 output:
@@ -131,8 +131,6 @@ Para realizar o download da base, assim como foi descrito na introdução,
 baixa acessar esse
 [link](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022).
 
-### **Dados carregados**
-
 O dataset possui **`r nrow(dataset)`** linhas e **`r ncol(dataset)`**
 colunas. Inicialmente realizamos um tratamento para remover colunas que
 só pussuem valores na da seguinte forma:
@@ -167,23 +165,26 @@ colunas:
 
 -   Country -\> País do usuário
 
--   ConvertedCompYearly -\> Quanto o usuário recebe como pagamento anual total em **USD**.
+-   ConvertedCompYearly -\> Quanto o usuário recebe como pagamento anual
+    total em *USD*
 
--   Levaremos em consideração valor de compensação anual para de no mínimo mil USD e no máximo 2 milhões USD
+-   Levaremos em consideração valor de compensação anual para de no
+    mínimo mil *USD* e no máximo 2 milhões *USD*
 
 ```{r message=FALSE, cache=TRUE, warning=FALSE}
 firstData <- select(dataset, Country, ConvertedCompYearly) %>% dplyr::filter(ConvertedCompYearly >= 1000 & ConvertedCompYearly <= 2000000) %>% drop_na()
 ```
 
 Após isso, temos o seguinte subset:
-  
+
 ```{r message=FALSE, cache=TRUE, warning=FALSE, results='asis'}
 head(firstData, 10) %>% kable() %>% kableExtra::kable_styling(bootstrap_options = c("responsive", "striped", "hover", "condensed"))
 ```
 
-E então, tiraremos a mediana salarial dos dez países com mais respostas ao questionário do Stack Overflow.
-Vale salientar, que escolhemos a mediana pois, 
-  
+E então, tiraremos a mediana salarial dos dez países com mais respostas
+ao questionário do Stack Overflow. Vale salientar, que escolhemos a
+mediana pois,
+
 ```{r message=FALSE, cache=TRUE, warning=FALSE, results='asis', fig.height=7, fig.width=7}
 
 df <- firstData %>% 
@@ -196,11 +197,19 @@ ggplot(data = head(df, 10), aes(x = median, y = Country, fill = "red")) +
   ggtitle("Mediana salarial anual em USD por Pais") +
   ylab('Paises') + xlab('Mediana salarial')  + 
   geom_text(aes(label=median),hjust = -0.2, color="black",
-            position = position_dodge(0.9), size=3.5) + xlim(c(0,200000)) 
-
-
+            position = position_dodge(0.9), size=3.5) + xlim(c(0,200000))
 ```
-Notamos pelo gráfico acima, através do estudo da mediana que os desenvolvedores são melhores remunerados nos Estados Unidos, o que faz sentido, tendo em vista que é o local onde encontram-se as gigantes da tecnologia. No entanto, como o trabalho de desenvolvedor pode ser realizado de forma remota, é possível que desenvolvedores de outros países trabalhem em gigantes localizadas nos Estados Unidos, ou em países do primeiro mundo, o que com toda certeza influencia a remuneração anual.
+
+### **Análise de comportamento**
+
+Notamos pelo gráfico acima, através do estudo da mediana que os
+desenvolvedores são melhores remunerados nos Estados Unidos, o que faz
+sentido, tendo em vista que é o local onde encontram-se as gigantes da
+tecnologia. No entanto, como o trabalho de desenvolvedor pode ser
+realizado de forma remota, é possível que desenvolvedores de outros
+países trabalhem em gigantes localizadas nos Estados Unidos, ou em
+países do primeiro mundo, o que com toda certeza influencia a
+remuneração anual.
 
 ## Comparativo da educação dos desenvolvedores por país {.sub-title}
 
@@ -224,7 +233,7 @@ head(education_country) %>%
 ```
 
 De maneira a facilitar a construção dos dados de forma visual, criaremos
-um subset elencando apenas os 10 países com maior quantidade de
+um subset elencando apenas os 5 países com maior quantidade de
 desenvolvedores da seguinte forma:
 
 ```{r message=FALSE, warning=FALSE}
@@ -262,6 +271,25 @@ legend("topright",pch=15,col=colors,legend=dev_by_country$Country, cex = 0.65)
 legend("right", pch=legend_names, legend=education_levels, cex = 0.55)
 ```
 
+### **Análise de comportamento**
+
+Como forma de análise podemos visualizar que o gráfico nos mostra
+algumas informações importantes. A primeira é que o país que tem mais
+desenvolvedores é nos EUA, dado que consolida o posicionamento dos EUA
+como uma potência na área de tecnologia, entretanto, é importante
+visualizar que o StackOverflow é uma plataforma cuja linguagem é o
+inglês e, por essa razão, os dados podem ser inflados de forma
+tendenciosa para o país norte americano.
+
+Um ponto que podemos, entretanto, inferir com segurança é que
+desenvolvedores em grande parte são aqueles que possuem um bacharelado o
+que demonstra uma relevância da academia para o profissional da área de
+TI.
+
+Dessa maneira, podemos afirmar que, na atualidade, cursar faculdades de
+bacharelado pode impulsionar as pessoas que desejam ingressar na área de
+TI.
+
 ## Qual a relação entre homens e mulheres na área de TI?
 
 Nesta seção iremos fazer um comparativo entre homens e mulheres no mundo
@@ -277,12 +305,8 @@ gender_dataset = dataset %>% filter(!is.na(Gender)) %>%
   select(Gender, Trans, Sexuality, YearsCode, ConvertedCompYearly) %>%
   filter(ConvertedCompYearly <= 2000000 & ConvertedCompYearly > 1000) %>%
   drop_na()
-gender_dataset = gender_dataset %>% filter(Gender == "Man" | Gender == "Woman", Trans == "Yes" | Trans == "No", Sexuality == "Straight / Heterosexual" | Sexuality == "Gay or Lesbian" | Sexuality == "Bisexual")
+gender_dataset = gender_dataset %>% filter(Gender == "Man" | Gender == "Woman")
 gender = data.frame(count = (gender_dataset %>% summarise(n()))[1,1], man_count = (gender_dataset %>% summarise(sum(Gender == "Man")))[1,1], woman_count = (gender_dataset %>% summarise(sum(Gender == "Woman")))[1,1])
-gender$man.straight_count = (gender_dataset %>% filter(Gender == "Man", Sexuality == "Straight / Heterosexual") %>% summarise(n()))[1,1]
-gender$woman.straight_count = (gender_dataset %>% filter(Gender == "Woman", Sexuality == "Straight / Heterosexual") %>% summarise(n()))[1,1]
-gender$man.trans_count = (gender_dataset %>% filter(Gender == "Man", Trans == "Yes") %>% summarise(n()))[1,1]
-gender$woman.trans_count = (gender_dataset %>% filter(Gender == "Woman", Trans == "Yes") %>% summarise(n()))[1,1]
 ```
 
 Primeiramente podemos fazer uma análise básica a respeito do mercado de
@@ -359,3 +383,13 @@ Claramente isso torna a área menos atrativa para as mulheres que, não só
 são desestimuladas no nível social a exercerem profissões relacionadas a
 TI assim como elas tendem a ganhar menos mesmo quando possuem um tempo
 de experiência igual ou próximo ao de um homem.
+
+# Conclusão
+
+# Referências
+
+-   Database do projeto: [link para
+    download](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022 "Base de dados do StackOverflow 2022").
+
+-   Estatística sobre mulheres na tecnologia:
+    [matéria](https://www.computerweekly.com/br/reportagen/Estatisticas-sobre-mulheres-em-tecnologia-Ultimas-pesquisas-e-tendencias "Estatística sobre mulheres em tecnologia").
