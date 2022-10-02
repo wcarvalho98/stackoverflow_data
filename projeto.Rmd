@@ -69,10 +69,8 @@ esclarecer dúvidas sobre códigos.
 Por ser uma das ferramentas mais utilizadas, com o propósito de troca de
 conhecimento em programação. Esperamos, inferir através da comunidade de
 usuários da plataforma, informações como: "Comparativo salarial dos
-desenvolvedores ao redor do mundo", "Meios de aprendizagem mais
-utilizados para aprendizado da programação", "Gêneros dos profissionais
-de desenvolvimento por localidade", "Etnia dos profissionais vs Salário
-médio", "Saúde mental dos profissionais".
+desenvolvedores ao redor do mundo", "Escolaridade dos profissionais", "Gênero dos profissionais
+de desenvolvimento".
 
 ## Origem dos dados {.sub-title}
 
@@ -90,8 +88,8 @@ dos dados extraindo características dos desenvolvedores como sua
 educação, trabalho, salário entre outra(s) característica(s).
 
 A partir disso iremos elencar os países desses desenvolvedores em um
-conjunto de análises de maneira a visualizar pontos como salário médio
-entre os desenvolvedores ao redor do mundo, educação dos desenvolvedores
+conjunto de análises de maneira a visualizar pontos como a mediana salarial
+dos desenvolvedores ao redor do mundo, educação dos desenvolvedores
 por país, experiência de trabalho baseada no sexo e densidade de
 profissionais em cada país.
 
@@ -349,7 +347,10 @@ desigualdade de gênero ao redor do mundo como podemos observar nessa
 Entretanto, para entendermos a razão desse cenário de desigualdade
 precisamos investigar as relações de causa e efeito que tornam isso uma
 realidade. Para isso irei analisar o tempo de experiência médio entre o
-público feminino e masculino assim como a média salarial:
+público feminino e masculino assim como a média salarial anual em **USD**.
+
+Vale salientar que para a análise desse gráfico na questão de média salarial anual os valores do eixo **y** devem ser multiplicados por *1000*.
+
 
 ```{r message=FALSE, warning=FALSE}
 library(ggplot2)
@@ -372,11 +373,10 @@ legend("topright",pch = 15,col=colors,legend=data$group)
 
 ### **Análise de comportamento**
 
-Nos gráficos acima podemos visualizar que, enquanto temos uma grandia
+Nos gráficos acima podemos visualizar que, enquanto temos uma grande
 quantia de homens na área de TI, as mulheres representam uma parcela
 quase inexistente. Ao vermos como se comporta o gráfico salarial médio
-podemos notar que as mulheres recebem bem menos que os homens no
-comparativo anual enquanto possuem um tempo de experiência médio se
+podemos notar que as mulheres recebem anualmente bem menos que os homens no enquanto possuem um tempo de experiência média menor se
 comparado aos homens.
 
 Claramente isso torna a área menos atrativa para as mulheres que, não só
@@ -385,6 +385,52 @@ TI assim como elas tendem a ganhar menos mesmo quando possuem um tempo
 de experiência igual ou próximo ao de um homem.
 
 # Conclusão
+
+O presente trabalho teve como objetivo fazer uma análise exploratória
+referente ao **Survey** de 2022 realizado pelo [**Stack
+Overflow**](https://www.kaggle.com/datasets/dheemanthbhat/stack-overflow-annual-developer-survey-2022).
+
+O dataset inicial contém várias informações a respeito dos usuários da
+plataforma, no entanto, optamos por explorar detalhes voltados a
+*Remuneração Anual dos profissionais por países, Nível educacional por
+países* e por fim, buscamos identificar o comparativo entre percentual
+entre *Mulheres X Homens* bem como a diferença salarial entre os dois
+grupos usuários da plataforma.\
+\
+A razão de se analisar a relação salário versus países, se deu por conta
+do desejo bem difundido de vários estudantes e profissionais de TI, de
+se aventurarem na área em outros países. Em geral, tem-se a ideia de que
+países Europeus são melhor remunerados que o Brasil, buscamos ter mais
+ou menos uma ideia do quanto isso é verdade. E identificamos, que sim,
+que países como Estados Unidos, Canadá, que são os países dos sonhos
+para muitos desenvolvedores, tem sim uma remuneração salarial melhor do
+que os outros paises.
+
+A partir da primeira análise, podemos ver os países mais bem
+remunerados. Em seguida, *qual é o grau de escolaridade dos
+profissionais nesses países?* Então, para os cinco países com mais
+respostas ao *survey* dentro do nosso Dataset, inferimos qual é o nível
+de escolaridade geral dos profissionais da área, para identificar o que
+se espera de um desenvolvedor nesses países. A ideia geral, que vende-se
+no Brasil é que precisa-se apenas de curiosidade, que diploma
+universitário não significa nada. Então, a partir dessa análise buscamos
+saber no mercado de trabalho estrangeiro, o quanto essa crença é
+verdadeira. A partir da análise gráfica, identificamos que sim, existem
+profissionais que não tem formação universitária completa e em casos
+extremos uma pequena parte tem apenas o ensino fundamental. Mas nos
+Estados Unidos, país com a melhor remuneração de acordo com a análise
+anterior, a grande maioria dos profissionais tem no mínimo um diploma
+universitário. Então, entende-se que o mercado em si anda preferindo
+profissionais com um diploma universitário.
+
+E por fim, buscamos analisar a diferença se é que existe, entre a
+quantidade de profissionais Homens x Mulheres. Além disso, em termos de
+experiência profissional o quão diferente é o salário médio de ambos os
+grupos. A partir da análise, constatamos o que já esperávamos, a
+quantidade de Homens no como profissionais de desenvolvimento de
+Software ainda é superior às de mulheres. E o salário anual das mulheres acaba sendo menor que os dos homens, mesmo com um tempo de experiência parecido.
+
+Com essa análise, conseguimos dados bastante interessantes sobre o mercado de TI, usando dados disponíveis publicamente sobre os usuários de um dos ambiente mais utilizados por programadores e programadoras em todo o mundo. No entanto, esse Dataset provê muito mais possibilidades de análise do que conseguimos inferir. Poderíamos também, analisar a porcentagem de profissionais LBGTs e/ou analisar linguagens de programação mais utilizadas e formas de aprendizado de programação. Enfim, São inúmeras as possibilidades de análise que não conseguimos cobrir e podem ser parte de um trabalho futuro.
 
 # Referências
 
